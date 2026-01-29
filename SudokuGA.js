@@ -38,15 +38,33 @@ function GAEvolve(population, settings) {
         if (nextPop.length >= population.length) break;
         nextPop.push({ gene: child2, fitness: settings.fitnessFunction(child2) });
     }
+
+    return nextPop;
 }
 
+
+/*roulette wheel selection helper*/
 function rouletteSelection(population, fitnessSum) {
-    let r = Math.random() * fitnessSum;
+    let pick = Math.random() * fitnessSum;
     let sum = 0;
     for (let i = 0; i < population.length; i++) {
         sum += population[i].fitness;
-        if (sum >= r) return population[i];
+        if (sum >= pick) return population[i];
     }
+}
+
+/*crossover of two parents*/
+function crossover(parent1, parent2, settings) {
+    let childGene = [];
+    let crossOverPoint = Math.floor(parent1.length / 2);
+    for (let i =0; i < parent1.length; i++) {
+        if (i < crossOverPoint) {
+            childGene.push(parent1[i]);
+        } else {
+            childGene.push(parent2[i]);
+        }
+    }
+    return { gene: childGene, fitness: settings.fitnessFunction(childGene) };
 }
 
 function sudokuFitness(array) {
