@@ -67,6 +67,15 @@ function crossover(parent1, parent2, settings) {
     return { gene: childGene, fitness: settings.fitnessFunction(childGene) };
 }
 
+/*mutation function*/
+function mutateIndividual(individual, settings) {
+    for (let i = 0; i < individual.gene.length; i++) {
+        if (Math.random() < settings.mutationRate) {
+            individual.gene[i] = settings.getRandomGeneValue();
+        }
+    }
+}
+
 function sudokuFitness(array) {
     let sudoku = new Sudoku(9);
     let size = Math.round(Math.sqrt(array.length));
