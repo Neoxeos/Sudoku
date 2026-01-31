@@ -69,16 +69,46 @@ function crossover(parent1, parent2, settings) {
 
 /*mutation function*/
 function mutateIndividual(individual, settings) {
-    for (let i = 0; i < individual.gene.length; i++) {
-        if (Math.random() < settings.mutationRate) {
-            individual.gene[i] = settings.getRandomGeneValue();
-        }
+    let index = Math.floor(Math.random() * individual.gene.length);
+    if (Math.random() < settings.mutationRate) {
+        individual.gene[index] = settings.getRandomGeneValue();
+        individual.fitness = settings.fitnessFunction(individual.gene);
     }
 }
 
+/*  Fitness function for Sudoku Simple
+    must return a postive fitness becaue of roulette selection
+*/
 function sudokuFitness(array) {
     let sudoku = new Sudoku(9);
     let size = Math.round(Math.sqrt(array.length));
     sudoku.setArray(array);
+    let fitness = 0;
+    for (let r = 0; r < size; r++)
+    {
+        let vals = new Set();
+        for (let c = 0; c < size; c++)
+        {
+            vals.add(sudoku.get(r,c));
+        }
+        fitness += vals.size;
+    }
     // add unique values in each row
+    let sqSize = Math.round(Math.sqrt(size));
+    for (let sr = 0; sr < sqSize; sr++)
+    {
+        for (let sc = 0; sc < sqSize; sc++)
+        {
+            let vals = new Set();
+            for (let c = 0; c < sqSize; c++)
+            {
+                for (let r = 0; r < sqSize; r++)
+                {
+                    vals.add(sudoku.get(sr*sqSize + r, sc*sqSize + c));
+                }
+            }
+            fitness += vals.size;
+        }
+    }
+    return fitness;
 }
