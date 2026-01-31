@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sudoku</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
 <body>
-    <div id="container">
-        <h1>Sudoku Game</h1>
-        <canvas id="sudokuCanvas"></canvas>
-        <div id="controls" position="absolute" top ="10px"  left="10px">
-            <button position="absolute" top="10px" id="newGameBtn">New Game</button>
-            <button position="absolute" top="10px" id="solveBtn">Solve</button>
-            <button position="absolute" top="10px" id="clearBtn">Clear</button>
+    <div class="container" style="display: flex; gap:20px;">
+        <div id="containerGUI" style="width: fit-content;" >
+            <h1>Sudoku Game</h1>
+            <canvas id="sudokuCanvas"></canvas>
+            <div id="controls" position="absolute" top ="10px" left="10px">
+                <button position="absolute" top="10px" id="newGameBtn">New Game</button>
+                <button position="absolute" top="10px" id="solveBtn">Solve</button>
+                <button position="absolute" top="10px" id="clearBtn">Clear</button>
+            </div>
         </div>
+        <div id="graph" style="width:50%; height: 600px; padding-top: 90px; padding-left: 20px;"></div>
     </div>
     <script src="sudoku.js"></script>
     <script src="GUI.js"></script>

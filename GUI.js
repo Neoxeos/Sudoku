@@ -1,7 +1,35 @@
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = 700;
-canvas.height = 700;
+canvas.width = 600;
+canvas.height = 600;
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const chart = Highcharts.chart('graph', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Fruit Consumption'
+        },
+        xAxis: {
+            categories: ['Apples', 'Bananas', 'Oranges']
+        },
+        yAxis: {
+            title: {
+                text: 'Fruit eaten'
+            }
+        },
+        series: [{
+            name: 'Jane',
+            data: [1, 0, 4]
+        }, {
+            name: 'John',
+            data: [5, 7, 3]
+        }]
+    });
+});
+
 
 class GUI {
     constructor(sudoku) {
@@ -47,6 +75,7 @@ class GUI {
 
 function run(){
     const sudoku = new Sudoku(9);
+    // initialize with random values
     sudoku.randomize();
     const gui = new GUI(sudoku);
     gui.drawBoard(sudoku);
