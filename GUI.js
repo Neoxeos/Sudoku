@@ -3,91 +3,47 @@ const ctx = canvas.getContext('2d');
 canvas.width = 600;
 canvas.height = 600;
 
-// Function to handle chart load and add new data points dynamically
-const onChartLoad = function () {
-    const chart = this,
-        series = chart.series[0];
 
-    setInterval(function () {
-        const x = (new Date()).getTime(), // current time
-            y = Math.random();
 
-        series.addPoint([x, y], true, true);
-    }, 1000);
-};
-
-// Create the initial data
-const data = (function () {
-    const data = [];
-    const time = new Date().getTime();
-
-    for (let i = -19; i <= 0; i += 1) {
-        data.push({
-            x: time + i * 1000,
-            y: Math.random()
-        });
-    }
-    return data;
-}());
-
-// Create the chart
-Highcharts.chart('graph', {
+// Sudoku Solver Performance Chart
+const chart = Highcharts.chart('graph', {
     chart: {
-        type: 'spline',
-        events: {
-            load: onChartLoad()
-        }
+        type: 'line'
     },
-
-    time: {
-        useUTC: false
-    },
-
     title: {
-        text: 'Live random data'
+        text: 'Sudoku Solver Performance'
     },
-
     xAxis: {
-        type: 'datetime',
-        tickPixelInterval: 150,
-        maxPadding: 0.1
+        title: {
+            text: 'Generation'
+        },
+        resize : {
+            enabled: true
+        },
+        min: 0
     },
-
     yAxis: {
         title: {
-            text: 'Value'
+            text: 'Fitness Score'
         },
-        plotLines: [
-            {
-                value: 0,
-                width: 1,
-                color: '#808080'
-            }
-        ]
+        resize : {
+            enabled: true
+        },
+        min : 0
     },
-
-    tooltip: {
-        headerFormat: '<b>{series.name}</b><br/>',
-        pointFormat: '{point.x:%Y-%m-%d %H:%M:%S}<br/>{point.y:.2f}'
-    },
-
-    legend: {
-        enabled: false
-    },
-
-    exporting: {
-        enabled: false
-    },
-
-    series: [
-        {
-            name: 'Random data',
-            lineWidth: 2,
-            color: Highcharts.getOptions().colors[2],
-            data
-        }
-    ]
+    series: [{
+        name: 'Best Fitness',
+        data: [{x:0, y:10}]
+    }, {
+        name: 'Average Fitness',
+        data: [{x:0, y:5}]
+    }]
 });
+
+function updateChart (x,y) {
+    chart.series[0].addPoint([x,y], true, false);
+    chart.series[1].addPoint([y,x], true, false);
+}
 
 class GUI {
     constructor(sudoku) {
@@ -139,4 +95,11 @@ function run(){
     gui.drawBoard(sudoku);
 }
 
-run();
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize GUI and Sudoku here
+    run();
+    setInterval(() => {
+        updateChart(Math.random() * 10, Math.random() * 10);
+    }, 1000);
+});
