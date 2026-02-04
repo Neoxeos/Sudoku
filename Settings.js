@@ -1,6 +1,6 @@
 class Settings {
     constructor(size) {
-        this.fitnessFuntion = sudokuFitness;
+        this.fitnessFunction = sudokuFitness;
         this.individualSize = size * size;
         this.mutationRate = 0.25;
         this.populationSize = 200;

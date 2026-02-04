@@ -15,7 +15,7 @@ function GAEvolve(population, settings) {
 
     // add randoms
     for (let i = 0; i < Math.floor(settings.randomRatio * population.length); i++) {
-        nextPop.push({ gene: settings.getRandomGeneValue(), fitness: settings.fitnessFunction(gene) });
+        nextPop.push({ gene: settings.getRandomGeneValue(), fitness: settings.fitnessFunction(population[i].gene) });
     }
 
     //generate rest of population
@@ -32,8 +32,8 @@ function GAEvolve(population, settings) {
         let child1 = crossover(parent1.gene, parent2.gene, settings);
         let child2 = crossover(parent2.gene, parent1.gene, settings);
         // mutate
-        mutate(child1, settings);
-        mutate(child2, settings);
+        mutateIndividual(child1, settings);
+        mutateIndividual(child2, settings);
         nextPop.push({ gene: child1, fitness: settings.fitnessFunction(child1) });
         if (nextPop.length >= population.length) break;
         nextPop.push({ gene: child2, fitness: settings.fitnessFunction(child2) });
