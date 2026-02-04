@@ -114,22 +114,23 @@ function selectIndividual(population) {
 
 function run(){
     let settings = new Settings(9);
-    let population = generatePop(9, 200);
+    let population = generatePop(9, 20);
+    console.log("Initial Population: ", population);
     let bestIndividual = selectIndividual(population);
     let sudoku = new Sudoku(9);
     sudoku.setArray(bestIndividual.gene);
     let gui = new GUI(sudoku);
     gui.drawBoard(sudoku);
-    console.log("Initial best fitness: " + bestIndividual.fitness);
 
-    // here we run the genetic algorithm loop until we hit the best solution
-/*     while (bestIndividual.fitness < 243) {
-        population= GAEvolve(population, settings);
+    //here we run the genetic algorithm loop until we hit the best solution
+    for ( let i = 0; i < 10; i++) {
+        population = GAEvolve(population, settings);
         bestIndividual = selectIndividual(population);
         sudoku = new Sudoku(9);
         sudoku.setArray(bestIndividual.gene);
         gui.drawBoard(sudoku);
-    } */
+        console.log("New population: ", population);
+    }
 }
 
 
