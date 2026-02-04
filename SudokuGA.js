@@ -5,7 +5,12 @@
 function GAEvolve(population, settings) {
     let nextPop = [];
 
-    // sort old pop descending by fitness 
+    // sort old pop descending by fitness but keep a copy for roulette selection 
+    let proxyPop = [];
+    for (let i = 0; i < population.length; i++) {
+        proxyPop.push({ gene: population[i].gene, fitness: population[i].fitness });
+    }
+
     population.sort((a,b) =>  b.fitness-a.fitness);
 
     // add elites
@@ -13,21 +18,22 @@ function GAEvolve(population, settings) {
         nextPop.push({ gene: population[i].gene, fitness: population[i].fitness });
     }
 
+
     // add randoms
-    for (let i = 0; i < Math.floor(settings.randomRatio * population.length); i++) {
-        nextPop.push({ gene: population[Math.floor(Math.random() * population.length)].gene, fitness: settings.fitnessFunction(population[Math.floor(Math.random() * population.length)].gene) });
+    for (let i = 0; i < Math.floor(settings.randomRatio * proxyPop.length); i++) {
+        nextPop.push({ gene: proxyPop[Math.floor(Math.random() * proxyPop.length)].gene, fitness: settings.fitnessFunction(proxyPop[Math.floor(Math.random() * proxyPop.length)].gene) });
     }
 
     //generate rest of population
     let fitnessSum = 0;
-    for (let i = 0; i < population.length; i++) {
-        fitnessSum += population[i].fitness;
+    for (let i = 0; i < proxyPop.length; i++) {
+        fitnessSum += proxyPop[i].fitness;
     }
 
-    while (nextPop.length < population.length) {
+    while (nextPop.length < proxyPop.length) {
         // select parents
-        let parent1 = rouletteSelection(population, fitnessSum);
-        let parent2 = rouletteSelection(population, fitnessSum);
+        let parent1 = rouletteSelection(proxyPop, fitnessSum);
+        let parent2 = rouletteSelection(proxyPop, fitnessSum);
         // crossover
         let child1 = crossover(parent1.gene, parent2.gene, settings);
         let child2 = crossover(parent2.gene, parent1.gene, settings);
@@ -35,9 +41,10 @@ function GAEvolve(population, settings) {
         mutateIndividual(child1, settings);
         mutateIndividual(child2, settings);
         nextPop.push({ gene: child1.gene, fitness: child1.fitness });
-        if (nextPop.length >= population.length) break;
+        if (nextPop.length >= proxyPop.length) break;
         nextPop.push({ gene: child2.gene, fitness: child2.fitness });
     }
+
     return nextPop;
 }
 

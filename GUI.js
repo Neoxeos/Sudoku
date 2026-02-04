@@ -91,14 +91,13 @@ class GUI {
 
 // generate initial population
 function generatePop(size, populationSize) {
-    const population = [];
+    let population = [];
     for (let i = 0; i < populationSize; i++) {
-        const sudoku = new Sudoku(size);
+        let sudoku = new Sudoku(size);
         sudoku.randomize();
-        // calculate fitness
         let fitness = sudokuFitness(sudoku.board);
         population.push({ gene: sudoku.board, fitness: fitness });
-    }
+    }   
     return population;
 }
 
