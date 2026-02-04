@@ -31,16 +31,20 @@ const chart = Highcharts.chart('graph', {
     },
     series: [{
         name: 'Best Fitness',
-        data: [{x:0, y:10}]
+        data: [{x:0, y:50}]
     }, {
         name: 'Average Fitness',
-        data: [{x:0, y:5}]
+        data: [{x:0, y:50}]
+    }, {
+        name: 'Worst Fitness',
+        data: [{x:0, y:50}]
     }]
 });
 
-function updateChart (x,y) {
-    chart.series[0].addPoint([x,y], true, false);
-    chart.series[1].addPoint([y,x], true, false);
+function updateChart (bestX,bestY, avgX, avgY, worstX, worstY) {
+    chart.series[0].addPoint({x:bestX, y:bestY}, true, false);
+    chart.series[1].addPoint({x:avgX, y:avgY}, true, false);
+    chart.series[2].addPoint({x:worstX, y:worstY}, true, false);
 }
 
 class GUI {
@@ -114,8 +118,8 @@ function selectIndividual(population) {
 
 function run(){
     let settings = new Settings(9);
-    let population = generatePop(9, 20);
-    console.log("Initial Population: ", population);
+    let population = generatePop(9, 200);
+    let generation = 0;
     let bestIndividual = selectIndividual(population);
     let sudoku = new Sudoku(9);
     sudoku.setArray(bestIndividual.gene);
@@ -123,21 +127,25 @@ function run(){
     gui.drawBoard(sudoku);
 
     //here we run the genetic algorithm loop until we hit the best solution
-    for ( let i = 0; i < 10; i++) {
+    let interval = setInterval(() => {
         population = GAEvolve(population, settings);
+        generation += 1;
         bestIndividual = selectIndividual(population);
         sudoku = new Sudoku(9);
         sudoku.setArray(bestIndividual.gene);
         gui.drawBoard(sudoku);
-        console.log("New population: ", population);
-    }
+        let avgFitness = population.reduce((sum , index) => sum + index.fitness, 0) / population.length;
+        let minFitness = population.reduce((min, index) => Math.min(min, index.fitness), Infinity);
+        updateChart(generation, bestIndividual.fitness, generation, avgFitness, generation, minFitness);
+
+        if (bestIndividual.fitness >= 243) {
+            clearInterval(interval);
+            console.log("Solution found!");
+        }
+    }, 25);
 }
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize GUI and Sudoku here
     run();
-    setInterval(() => {
-        updateChart(Math.random() * 10, Math.random() * 10);
-    }, 1000);
 });

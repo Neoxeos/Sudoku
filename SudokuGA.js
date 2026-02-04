@@ -38,7 +38,6 @@ function GAEvolve(population, settings) {
         if (nextPop.length >= population.length) break;
         nextPop.push({ gene: child2.gene, fitness: child2.fitness });
     }
-
     return nextPop;
 }
 
@@ -51,6 +50,7 @@ function rouletteSelection(population, fitnessSum) {
         sum += population[i].fitness;
         if (sum >= pick) return population[i];
     }
+    return population[0];
 }
 
 /*crossover of two parents*/
@@ -69,10 +69,12 @@ function crossover(parent1, parent2, settings) {
 
 /*mutation function*/
 function mutateIndividual(individual, settings) {
-    let index = Math.floor(Math.random() * individual.gene.length);
-    if (Math.random() < settings.mutationRate) {
-        individual.gene[index] = settings.getRandomGeneValue();
-        individual.fitness = settings.fitnessFunction(individual.gene);
+    for (let index = 0; index < individual.gene.length; index++) {
+        let pick = Math.random();
+        if (pick <= settings.mutationRate) {
+            individual.gene[index] = settings.getRandomGeneValue();
+            individual.fitness = settings.fitnessFunction(individual.gene);
+        }
     }
 }
 
