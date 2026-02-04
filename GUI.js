@@ -3,8 +3,6 @@ const ctx = canvas.getContext('2d');
 canvas.width = 600;
 canvas.height = 600;
 
-
-
 // Sudoku Solver Performance Chart
 const chart = Highcharts.chart('graph', {
     chart: {
@@ -46,7 +44,7 @@ function updateChart (x,y) {
 }
 
 class GUI {
-    constructor(sudoku) {
+    constructor() {
     }
 
     drawBoard(sudoku) {
@@ -87,12 +85,50 @@ class GUI {
         
 }
 
+// generate initial population
+function generatePop(size, populationSize) {
+    const population = [];
+    for (let i = 0; i < populationSize; i++) {
+        const sudoku = new Sudoku(size);
+        sudoku.randomize();
+        // calculate fitness
+        let fitness = sudokuFitness(sudoku.board);
+        population.push({ gene: sudoku.board, fitness: fitness });
+    }
+    return population;
+}
+
+// select best fit individual to display
+function selectIndividual(population) {
+    let selected = null;
+    let max = 0;
+    for (let i = 0; i < population.length; i++) {
+        let currentFitness = population[i].fitness;
+        if (currentFitness > max) {
+            max = currentFitness;
+            selected = population[i];
+        }
+    }
+    return selected;
+}
+
 function run(){
+    let settings = new Settings(9);
+    let population = generatePop(9, 200);
+    const bestIndividual = selectIndividual(population);
     const sudoku = new Sudoku(9);
-    // initialize with random values
-    sudoku.randomize();
+    sudoku.setArray(bestIndividual.gene);
     const gui = new GUI(sudoku);
     gui.drawBoard(sudoku);
+
+    // here we run the genetic algorithm loop until we hit the best solution
+    while (bestIndividual.fitness < 243) {
+        population= GAEvolve(population, settings);
+        bestIndividual = selectIndividual(population);
+        sudoku = new Sudoku(9);
+        sudoku.setArray(bestIndividual.gene);
+        gui.drawBoard(sudoku);
+    }
 }
 
 
