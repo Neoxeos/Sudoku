@@ -24,7 +24,7 @@ class Sudoku {
         return this.board[this.getIndex(row, col)];
     }
 
-    numConflitcts() {
+    numConflicts(row, col) {
         let conflicts = 0;
         for (let i = 0; i < this.size; i++) {
             if ( i != col && (this.get(row,i) == this.get(row,col)) ) {
@@ -41,11 +41,11 @@ class Sudoku {
 
         let sr = Math.floor(row / this.sqSize) * this.sqSize;
         let sc = Math.floor(col / this.sqSize) * this.sqSize;
-        for (let r = 0; r < r + this.sqSize; r++) {
-            for (let c = 0; c < c + this.sqSize; c++) {
+        for (let r = 0; r < this.sqSize; r++) {
+            for (let c = 0; c < this.sqSize; c++) {
                 let rr = sr + r;
                 let cc = sc + c;
-                if ( (rr != row || cc != col) && (this.get(rr,cc) == this.get(row,col)) ) {
+                if ( rr != row && cc != col && (this.get(rr,cc) == this.get(row,col)) ) {
                     conflicts++;
                     break;
                 }

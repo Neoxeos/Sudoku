@@ -80,13 +80,20 @@ class GUI {
         for (let r = 0; r < size; r++) {
             for (let c = 0; c < size; c++) {
                 const num = sudoku.get(r, c);
-                if (num !== 0) {
+                const conflicts = sudoku.numConflicts(r, c);
+                if (conflicts > 0) {
+                    if (conflicts == 1) {ctx.fillStyle = '#ffb6c1';}
+                    else if (conflicts == 2) {ctx.fillStyle = '#ff7f7f';}
+                    else {ctx.fillStyle = '#ff0000';}
+                    ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+                }
+               if (num !== 0) {
+                    ctx.fillStyle = 'black';
                     ctx.fillText(num, c * cellSize + cellSize / 2, r * cellSize + cellSize / 2);
                 }
             }
         }
     }
-        
 }
 
 // generate initial population
@@ -141,7 +148,7 @@ function run(){
             clearInterval(interval);
             console.log("Solution found!");
         }
-    }, 25);
+    }, 10);
 }
 
 
