@@ -134,11 +134,28 @@ function run(){
 
     //here we run the genetic algorithm loop until we hit the best solution
     let interval = setInterval(() => {
-        
-        if (generation > 1000) {
+
+        if (generation <= 500) {
+            settings.fullMutate = 0.20;
+        }
+        if (generation > 500 && generation <= 1000) {
+            settings.fullMutate = 0.05;
+        }
+        if (generation > 1000 && generation <= 2000) {
             settings.eliteMutate = true;
         }
-
+        if (generation > 2000 && generation <= 3000) {
+            settings.mutationRate = 0.45;
+            settings.elitism = 0.20;
+        }
+        if (generation > 3000 && generation <= 4000) {
+            settings.mutationRate = 0.55;
+            settings.elitism = 0.25;
+            settings.elitePointMutate = 0.20;
+        }
+        if (generation > 4000 && generation <= 5000) {
+            settings.elitism = 0.35;
+        }
         population = GAEvolve(population, settings);
         generation += 1;
         bestIndividual = selectIndividual(population);
@@ -149,7 +166,7 @@ function run(){
         let minFitness = population.reduce((min, index) => Math.min(min, index.fitness), Infinity);
         updateChart(generation, bestIndividual.fitness, generation, avgFitness, generation, minFitness);
 
-        if (bestIndividual.fitness >= 243) {
+        if (bestIndividual.fitness >= 351) {
             clearInterval(interval);
             console.log("Solution found!");
         }

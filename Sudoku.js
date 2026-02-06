@@ -26,19 +26,24 @@ class Sudoku {
 
     numConflicts(row, col) {
         let conflicts = 0;
-        for (let i = 0; i < this.size; i++) {
-            if ( i != col && (this.get(row,i) == this.get(row,col)) ) {
-                conflicts++;
-                break;
-            }
-        }
-        for (let i = 0; i < this.size; i++) {
-            if ( i != row && (this.get(i,col) == this.get(row,col)) ) {
+
+        //rows
+        for (let c = 0; c < this.size; c++) {
+            if ( c != col && (this.get(row,c) == this.get(row,col)) ) {
                 conflicts++;
                 break;
             }
         }
 
+        // columns
+        for (let r = 0; r < this.size; r++) {
+            if ( r != row && (this.get(r,col) == this.get(row,col)) ) {
+                conflicts++;
+                break;
+            }
+        }
+
+        // square
         let sr = Math.floor(row / this.sqSize) * this.sqSize;
         let sc = Math.floor(col / this.sqSize) * this.sqSize;
         for (let r = 0; r < this.sqSize; r++) {

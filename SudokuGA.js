@@ -93,9 +93,16 @@ function mutateIndividual(individual, settings) {
     if (pick > settings.mutationRate) {
         return;
     }
+    // if (pick < settings.fullMutate) {
+    //     // full mutation
+    //     for (let index = 0; index < individual.gene.length; index++) {
+    //         individual.gene[index] = settings.getRandomGeneValue();
+    //     }
+    //     return;
+    // } 
     sudoku.setArray(individual.gene);
     for (let index = 0; index < individual.gene.length; index++) {
-        if (sudoku.numConflicts(Math.floor(index / 9), index % 9 > 0)) {
+        if (sudoku.numConflicts(Math.floor(index / 9), index % 9) > 0) {
             individual.gene[index] = settings.getRandomGeneValue();
         }
     }
@@ -111,12 +118,20 @@ function mutateElite(individual, settings) {
 
     let sudoku = new Sudoku(9);
     sudoku.setArray(newGene);
-
-    for (let index = 0; index < newGene.length; index++) {
-        if (sudoku.numConflicts(Math.floor(index / 9), index % 9 > 0)) {
-            newGene[index] = settings.getRandomGeneValue();
+    let pick = Math.random();
+    if (pick > settings.elitePointMutate) {
+        for (let index = 0; index < newGene.length; index++) {
+            if (sudoku.numConflicts(Math.floor(index / 9), index % 9) > 0) {
+                newGene[index] = settings.getRandomGeneValue();
+            }
         }
-    }
+    } 
+    // else {
+    //     // mutate all
+    //     for (let index = 0; index < newGene.length; index++) {
+    //         newGene[index] = settings.getRandomGeneValue();;
+    //     }
+    // }
 
     let fitness = settings.fitnessFunction(newGene);
     return { gene: newGene, fitness: fitness };
@@ -135,22 +150,34 @@ function sudokuFitness(array) {
     for (let r = 0; r < size; r++)
     {
         let vals = new Set();
+        let sum = 0;
+        let bonus = 0;
+        let noCinflitcts = 0;
         for (let c = 0; c < size; c++)
         {
             vals.add(sudoku.get(r,c));
+            sum += sudoku.get(r,c);
+            if (sudoku.numConflicts(r,c) == 0) {
+                noCinflitcts += 1;
+            }
         }
-        fitness += vals.size;
+        if (sum == 45) {bonus += 1};
+        fitness += vals.size + bonus + noCinflitcts;
     }
 
     //column
     for (let c = 0; c < size; c++)
     {
         let vals = new Set();
+        let sum = 0;
+        let bonus = 0;
         for (let r = 0; r < size; r++)
         {
             vals.add(sudoku.get(r,c));
+            sum += sudoku.get(r,c);
         }
-        fitness += vals.size;
+        if (sum == 45) {bonus += 1};
+        fitness += vals.size + bonus;
     }
 
     //square
@@ -160,14 +187,18 @@ function sudokuFitness(array) {
         for (let sc = 0; sc < sqSize; sc++)
         {
             let vals = new Set();
+            let sum = 0;
+            let bonus = 0;
             for (let c = 0; c < sqSize; c++)
             {
                 for (let r = 0; r < sqSize; r++)
                 {
                     vals.add(sudoku.get(sr*sqSize + r, sc*sqSize + c));
+                    sum += sudoku.get(sr*sqSize + r, sc*sqSize + c);
                 }
             }
-            fitness += vals.size;
+            if (sum == 45) {bonus += 1};
+            fitness += vals.size + bonus;
         }
     }
     return fitness;
