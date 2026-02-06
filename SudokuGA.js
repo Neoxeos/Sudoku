@@ -35,9 +35,9 @@ function GAEvolve(population, settings) {
         // mutate
         mutateIndividual(child1, settings);
         mutateIndividual(child2, settings);
-        nextPop.push({ gene: child1.gene, fitness: child1.fitness });
+        nextPop.push(child1);
         if (nextPop.length >= population.length) break;
-        nextPop.push({ gene: child2.gene, fitness: child2.fitness });
+        nextPop.push(child2);
     }
 
     return nextPop;
