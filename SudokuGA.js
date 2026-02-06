@@ -246,8 +246,6 @@ function improveGA(individual, settings) {
         }
         settings.Policy = "square";
     }
-
-    console.log(sudoku.board +  " Fitness: " + settings.fitnessFunction(sudoku.board));
     return { gene: sudoku.board, fitness: settings.fitnessFunction(sudoku.board) };
 }
 
