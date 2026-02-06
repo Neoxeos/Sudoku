@@ -7,7 +7,9 @@ class Settings {
         this.populationSize = 200;
         this.elitism = 0.15;
         this.eliteMutate = false;
-        this.elitePointMutate = 0.10;
+        this.elitePointMutate = 0.05;
+        this.Policy = "square"; 
+        this.Final = true;
         this.randomRatio = 0.05;
         this.individualValues = [];
         for (let i = 1; i <= size; i++) {

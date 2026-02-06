@@ -141,20 +141,23 @@ function run(){
         if (generation > 500 && generation <= 1000) {
             settings.fullMutate = 0.05;
         }
-        if (generation > 1000 && generation <= 2000) {
+        if (generation > 1000 && generation <= 1500) {
             settings.eliteMutate = true;
         }
-        if (generation > 2000 && generation <= 3000) {
+        if (generation > 1500 && generation <= 2000) {
             settings.mutationRate = 0.45;
             settings.elitism = 0.20;
         }
-        if (generation > 3000 && generation <= 4000) {
+        if (generation > 2000 && generation <= 2500) {
             settings.mutationRate = 0.55;
             settings.elitism = 0.25;
-            settings.elitePointMutate = 0.20;
+            settings.elitePointMutate = 0.15;
         }
-        if (generation > 4000 && generation <= 5000) {
+        if (generation > 2500 && generation <= 3000) {
             settings.elitism = 0.35;
+        }
+        if (generation > 3000) {
+            settings.Final = true;
         }
         population = GAEvolve(population, settings);
         generation += 1;
