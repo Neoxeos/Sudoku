@@ -25,7 +25,7 @@ function GAEvolve(population, settings) {
         fitnessSum += population[i].fitness;
     }
 
-    while (nextPop.length < population.length) {
+    while (nextPop.length < settings.populationSize) {
         // select parents
         let parent1 = rouletteSelection(population, fitnessSum);
         let parent2 = rouletteSelection(population, fitnessSum);
@@ -36,7 +36,7 @@ function GAEvolve(population, settings) {
         mutateIndividual(child1, settings);
         mutateIndividual(child2, settings);
         nextPop.push(child1);
-        if (nextPop.length >= population.length) break;
+        if (nextPop.length >= settings.populationSize) break;
         nextPop.push(child2);
     }
 
@@ -48,9 +48,9 @@ function GAEvolve(population, settings) {
 function rouletteSelection(population, fitnessSum) {
     let pick = Math.random() * fitnessSum;
     let sum = 0;
-    for (let i = population.length -1; i >= 0; i--) {
+    for (let i = 0; i < population.length; i++) {
         sum += population[i].fitness;
-        if (sum >= pick) return population[i];
+        if (sum > pick) return population[i];
     }
     return population[0];
 }
@@ -80,12 +80,15 @@ function crossover(parent1, parent2, settings) {
 /*mutation function*/
 function mutateIndividual(individual, settings) {
     let sudoku = new Sudoku(9);
+    let pick = Math.random();
+    if (pick > settings.mutationRate) {
+        return;
+    }
     sudoku.setArray(individual.gene);
     for (let index = 0; index < individual.gene.length; index++) {
-        let pick = Math.random();
-        if (pick <= settings.mutationRate && (sudoku.numConflicts(Math.floor(index / 9), index % 9) > 0)) {
+        //if (sudoku.numConflicts(Math.floor(index / 9), index % 9 > 0)) {
             individual.gene[index] = settings.getRandomGeneValue();
-        }
+        //}
     }
     individual.fitness = settings.fitnessFunction(individual.gene);
 }
@@ -98,6 +101,8 @@ function sudokuFitness(array) {
     let size = Math.round(Math.sqrt(array.length));
     sudoku.setArray(array);
     let fitness = 0;
+
+    //row
     for (let r = 0; r < size; r++)
     {
         let vals = new Set();
@@ -107,7 +112,19 @@ function sudokuFitness(array) {
         }
         fitness += vals.size;
     }
-    // add unique values in each row
+
+    //column
+    for (let c = 0; c < size; c++)
+    {
+        let vals = new Set();
+        for (let r = 0; r < size; r++)
+        {
+            vals.add(sudoku.get(r,c));
+        }
+        fitness += vals.size;
+    }
+
+    //square
     let sqSize = Math.round(Math.sqrt(size));
     for (let sr = 0; sr < sqSize; sr++)
     {

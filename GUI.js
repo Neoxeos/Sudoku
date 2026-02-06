@@ -124,7 +124,7 @@ function selectIndividual(population) {
 
 function run(){
     let settings = new Settings(9);
-    let population = generatePop(9, 200);
+    let population = generatePop(9, settings.populationSize);
     let generation = 0;
     let bestIndividual = selectIndividual(population);
     let sudoku = new Sudoku(9);
