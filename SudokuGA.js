@@ -6,34 +6,29 @@ function GAEvolve(population, settings) {
     let nextPop = [];
 
     // sort old pop descending by fitness but keep a copy for roulette selection 
-    let proxyPop = [];
-    for (let i = 0; i < population.length; i++) {
-        proxyPop.push({ gene: population[i].gene, fitness: population[i].fitness });
-    }
-
     population.sort((a,b) =>  b.fitness-a.fitness);
 
     // add elites
     for (let i = 0; i < Math.floor(settings.elitism * population.length); i++) {
-        nextPop.push({ gene: population[i].gene, fitness: population[i].fitness });
+        nextPop.push(population[i]);
     }
 
-
     // add randoms
-    for (let i = 0; i < Math.floor(settings.randomRatio * proxyPop.length); i++) {
-        nextPop.push({ gene: proxyPop[Math.floor(Math.random() * proxyPop.length)].gene, fitness: settings.fitnessFunction(proxyPop[Math.floor(Math.random() * proxyPop.length)].gene) });
+    for (let i = 0; i < Math.floor(settings.randomRatio * population.length); i++) {
+        let individual = population[Math.floor(Math.random() * population.length)];
+        nextPop.push(individual);
     }
 
     //generate rest of population
     let fitnessSum = 0;
-    for (let i = 0; i < proxyPop.length; i++) {
-        fitnessSum += proxyPop[i].fitness;
+    for (let i = 0; i < population.length; i++) {
+        fitnessSum += population[i].fitness;
     }
 
-    while (nextPop.length < proxyPop.length) {
+    while (nextPop.length < population.length) {
         // select parents
-        let parent1 = rouletteSelection(proxyPop, fitnessSum);
-        let parent2 = rouletteSelection(proxyPop, fitnessSum);
+        let parent1 = rouletteSelection(population, fitnessSum);
+        let parent2 = rouletteSelection(population, fitnessSum);
         // crossover
         let child1 = crossover(parent1.gene, parent2.gene, settings);
         let child2 = crossover(parent2.gene, parent1.gene, settings);
@@ -41,7 +36,7 @@ function GAEvolve(population, settings) {
         mutateIndividual(child1, settings);
         mutateIndividual(child2, settings);
         nextPop.push({ gene: child1.gene, fitness: child1.fitness });
-        if (nextPop.length >= proxyPop.length) break;
+        if (nextPop.length >= population.length) break;
         nextPop.push({ gene: child2.gene, fitness: child2.fitness });
     }
 
@@ -53,7 +48,7 @@ function GAEvolve(population, settings) {
 function rouletteSelection(population, fitnessSum) {
     let pick = Math.random() * fitnessSum;
     let sum = 0;
-    for (let i = 0; i < population.length; i++) {
+    for (let i = population.length -1; i >= 0; i--) {
         sum += population[i].fitness;
         if (sum >= pick) return population[i];
     }
@@ -63,12 +58,20 @@ function rouletteSelection(population, fitnessSum) {
 /*crossover of two parents*/
 function crossover(parent1, parent2, settings) {
     let childGene = [];
-    let crossOverPoint = Math.floor(parent1.length / 2);
+    let crossOverPoint1 = Math.floor( (Math.random()*parent1.length) / 3);
+    let crossOverPoint2 = crossOverPoint1 + Math.floor((Math.random()*parent1.length) / 3);
     for (let i =0; i < parent1.length; i++) {
-        if (i < crossOverPoint) {
+        if (i < crossOverPoint1) {
             childGene.push(parent1[i]);
-        } else {
+        } else if (i >= crossOverPoint1 && i < crossOverPoint2) {
             childGene.push(parent2[i]);
+        } else {
+            let pick = Math.random();
+            if (pick < 0.5) {
+                childGene.push(parent2[i]);
+            } else {
+                childGene.push(parent1[i]);
+            }
         }
     }
     return { gene: childGene, fitness: settings.fitnessFunction(childGene) };
@@ -76,13 +79,15 @@ function crossover(parent1, parent2, settings) {
 
 /*mutation function*/
 function mutateIndividual(individual, settings) {
+    let sudoku = new Sudoku(9);
+    sudoku.setArray(individual.gene);
     for (let index = 0; index < individual.gene.length; index++) {
         let pick = Math.random();
-        if (pick <= settings.mutationRate) {
+        if (pick <= settings.mutationRate && (sudoku.numConflicts(Math.floor(index / 9), index % 9) > 0)) {
             individual.gene[index] = settings.getRandomGeneValue();
-            individual.fitness = settings.fitnessFunction(individual.gene);
         }
     }
+    individual.fitness = settings.fitnessFunction(individual.gene);
 }
 
 /*  Fitness function for Sudoku Simple
