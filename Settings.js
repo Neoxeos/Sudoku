@@ -4,7 +4,8 @@ class Settings {
         this.individualSize = size * size;
         this.mutationRate = 0.30;
         this.populationSize = 200;
-        this.elitism = 0.1;
+        this.elitism = 0.15;
+        this.eliteMutate = false;
         this.randomRatio = 0.05;
         this.individualValues = [];
         for (let i = 1; i <= size; i++) {

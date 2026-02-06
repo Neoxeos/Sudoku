@@ -13,6 +13,15 @@ function GAEvolve(population, settings) {
         nextPop.push(population[i]);
     }
 
+    // improve elites and add them to next population to try and get forward progress faster
+    if (settings.eliteMutate) {
+        let size = nextPop.length;
+        for (let i = 0; i < size; i++) {
+            let newGene = mutateElite(nextPop[i], settings);
+            nextPop.push(newGene);
+        }
+    }
+
     // add randoms
     for (let i = 0; i < Math.floor(settings.randomRatio * population.length); i++) {
         let individual = population[Math.floor(Math.random() * population.length)];
@@ -86,11 +95,31 @@ function mutateIndividual(individual, settings) {
     }
     sudoku.setArray(individual.gene);
     for (let index = 0; index < individual.gene.length; index++) {
-        //if (sudoku.numConflicts(Math.floor(index / 9), index % 9 > 0)) {
+        if (sudoku.numConflicts(Math.floor(index / 9), index % 9 > 0)) {
             individual.gene[index] = settings.getRandomGeneValue();
-        //}
+        }
     }
     individual.fitness = settings.fitnessFunction(individual.gene);
+}
+
+/*mutation function for elites*/
+function mutateElite(individual, settings) {
+    let newGene = [];
+    for (let i = 0; i < individual.gene.length; i++) {
+        newGene.push(individual.gene[i]);
+    }
+
+    let sudoku = new Sudoku(9);
+    sudoku.setArray(newGene);
+
+    for (let index = 0; index < newGene.length; index++) {
+        if (sudoku.numConflicts(Math.floor(index / 9), index % 9 > 0)) {
+            newGene[index] = settings.getRandomGeneValue();
+        }
+    }
+
+    let fitness = settings.fitnessFunction(newGene);
+    return { gene: newGene, fitness: fitness };
 }
 
 /*  Fitness function for Sudoku Simple

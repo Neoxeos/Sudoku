@@ -31,13 +31,13 @@ const chart = Highcharts.chart('graph', {
     },
     series: [{
         name: 'Best Fitness',
-        data: [{x:0, y:50}]
+        data: [{x:0, y:165}]
     }, {
         name: 'Average Fitness',
-        data: [{x:0, y:50}]
+        data: [{x:0, y:155}]
     }, {
         name: 'Worst Fitness',
-        data: [{x:0, y:50}]
+        data: [{x:0, y:130}]
     }]
 });
 
@@ -85,7 +85,7 @@ class GUI {
                     if (conflicts == 1) {ctx.fillStyle = '#ffb6c1';}
                     else if (conflicts == 2) {ctx.fillStyle = '#ff7f7f';}
                     else {ctx.fillStyle = '#ff0000';}
-                    ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+                    ctx.fillRect(c * cellSize, r * cellSize, cellSize-1, cellSize-1);
                 }
                if (num !== 0) {
                     ctx.fillStyle = 'black';
@@ -125,7 +125,7 @@ function selectIndividual(population) {
 function run(){
     let settings = new Settings(9);
     let population = generatePop(9, settings.populationSize);
-    let generation = 0;
+    let generation = 1;
     let bestIndividual = selectIndividual(population);
     let sudoku = new Sudoku(9);
     sudoku.setArray(bestIndividual.gene);
@@ -134,6 +134,11 @@ function run(){
 
     //here we run the genetic algorithm loop until we hit the best solution
     let interval = setInterval(() => {
+        
+        if (generation > 1000) {
+            settings.eliteMutate = true;
+        }
+
         population = GAEvolve(population, settings);
         generation += 1;
         bestIndividual = selectIndividual(population);
