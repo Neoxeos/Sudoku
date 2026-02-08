@@ -9,7 +9,7 @@ class Settings {
         this.eliteMutate = false;
         this.elitePointMutate = 0.05;
         this.Policy = "square"; 
-        this.Final = false;
+        this.Final = true;
         this.randomRatio = 0.05;
         this.individualValues = [];
         for (let i = 1; i <= size; i++) {

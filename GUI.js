@@ -135,28 +135,22 @@ function run(){
     //here we run the genetic algorithm loop until we hit the best solution
     let interval = setInterval(() => {
 
-        if (generation <= 500) {
-            settings.fullMutate = 0.20;
-        }
         if (generation > 500 && generation <= 1000) {
-            settings.fullMutate = 0.05;
-        }
-        if (generation > 1000 && generation <= 1500) {
             settings.eliteMutate = true;
         }
-        if (generation > 1500 && generation <= 2000) {
+        if (generation > 1000 && generation <= 1500) {
             settings.mutationRate = 0.45;
             settings.elitism = 0.20;
         }
-        if (generation > 2000 && generation <= 2500) {
+        if (generation > 1800 && generation <= 2250) {
             settings.mutationRate = 0.55;
             settings.elitism = 0.25;
             settings.elitePointMutate = 0.15;
         }
-        if (generation > 2500 && generation <= 3000) {
+        if (generation > 2250 && generation <= 2500) {
             settings.elitism = 0.35;
         }
-        if (generation > 3000) {
+        if (generation > 2800) {
             settings.Final = true;
         }
         population = GAEvolve(population, settings);

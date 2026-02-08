@@ -52,6 +52,10 @@ function GAEvolve(population, settings) {
         // mutate
         mutateIndividual(child1, settings);
         mutateIndividual(child2, settings);
+        if (settings.Final) {
+            child1 = improveGA(child1, settings);
+            child2 = improveGA(child2, settings);
+        }
         nextPop.push(child1);
         if (nextPop.length >= settings.populationSize) break;
         nextPop.push(child2);
@@ -101,13 +105,6 @@ function mutateIndividual(individual, settings) {
     if (pick > settings.mutationRate) {
         return;
     }
-    // if (pick < settings.fullMutate) {
-    //     // full mutation
-    //     for (let index = 0; index < individual.gene.length; index++) {
-    //         individual.gene[index] = settings.getRandomGeneValue();
-    //     }
-    //     return;
-    // } 
     sudoku.setArray(individual.gene);
     for (let index = 0; index < individual.gene.length; index++) {
         if (sudoku.numConflicts(Math.floor(index / 9), index % 9) > 0) {
@@ -134,13 +131,6 @@ function mutateElite(individual, settings) {
             }
         }
     } 
-    // else {
-    //     // mutate all
-    //     for (let index = 0; index < newGene.length; index++) {
-    //         newGene[index] = settings.getRandomGeneValue();;
-    //     }
-    // }
-
     let fitness = settings.fitnessFunction(newGene);
     return { gene: newGene, fitness: fitness };
 }
@@ -152,7 +142,6 @@ function improveGA(individual, settings) {
     sudoku.setArray(individual.gene);
 
     // square 
-    if (settings.Policy == "square") {
         let sqSize = Math.round(Math.sqrt(size));
         for (let sr = 0; sr < sqSize; sr++)
         {
@@ -169,27 +158,35 @@ function improveGA(individual, settings) {
                     for (let r = 0; r < sqSize; r++)
                     {
                         let num = sudoku.get(sr*sqSize + r, sc*sqSize + c);
-                        vals.set(num, [].push({r: sr*sqSize + r, c: sc*sqSize + c}));
+                        let updatedPos = [...vals.get(num), {r: sr*sqSize + r, c: sc*sqSize + c}];
+                        vals.set(num, updatedPos);
                     }
                 }
 
                 // done with square
+                let swapPos = null;
+                let valIn = null;
+                let c1 = false;
+                let c2 = false;
                 for (let [key, value] of vals) {
+                    let m = 0;
                     if (value.length == 0) {
                         // find a number to swap with
-                        for (let [k, v] of vals) {
-                            if (v.length > 1) {
-                                let swapPos = v.reduce((a,b) => sudoku.numConflicts(a.r, a.c) > sudoku.numConflicts(b.r, b.c) ? a : b);
-                                sudoku.set(swapPos.r, swapPos.c, key);
-                                break;
-                            }
+                        valIn = key;
+                        c1 = true;
+                    }
+                    else if (value.length > 1) {
+                        if ( value.length > m) {
+                            m = value.length;
+                            swapPos = value.reduce((a,b) => sudoku.numConflicts(a.r, a.c) > sudoku.numConflicts(b.r, b.c) ? a : b);
+                            c2 = true;
                         }
                     }
                 }
+                if (c1 && c2) {sudoku.set(swapPos.r, swapPos.c, valIn);}
             }
         }
-        settings.Policy = "row";
-    } else if (settings.Policy == "row") {
+        // row
         for (let r = 0; r < size; r++)
         {
             let vals = new Map();
@@ -199,25 +196,33 @@ function improveGA(individual, settings) {
             for (let c = 0; c < size; c++)
             {
                 let num = sudoku.get(r,c);
-                vals.set(num, [].push({r: r, c: c}));
+                let updatedPos = [...vals.get(num), {r: r, c: c}];
+                vals.set(num, updatedPos);
             }
 
             // done with row
+            let swapPos = null;
+            let valIn = null;
+            let c1 = false;
+            let c2 = false;
             for (let [key, value] of vals) {
+                let m = 0;
                 if (value.length == 0) {
                     // find a number to swap with
-                    for (let [k, v] of vals) {
-                        if (v.length > 1) {
-                            let swapPos = v.reduce((a,b) => sudoku.numConflicts(a.r, a.c) > sudoku.numConflicts(b.r, b.c) ? a : b);
-                            sudoku.set(swapPos.r, swapPos.c, key);
-                            break;
-                        }
+                    valIn = key;
+                    c1 = true;
+                }
+                else if (value.length > 1) {
+                    if ( value.length > m) {
+                        m = value.length;
+                        swapPos = value.reduce((a,b) => sudoku.numConflicts(a.r, a.c) > sudoku.numConflicts(b.r, b.c) ? a : b);
+                        c2 = true;
                     }
                 }
             }
+            if (c1 && c2) {sudoku.set(swapPos.r, swapPos.c, valIn);}
         }
-        settings.Policy = "column";
-    } else if (settings.Policy == "column") {
+        // column
         for (let c = 0; c < size; c++)
         {
             let vals = new Map();
@@ -227,25 +232,32 @@ function improveGA(individual, settings) {
             for (let r = 0; r < size; r++)
             {
                 let num = sudoku.get(r,c);
-                vals.set(num, [].push({r: r, c: c}));
+                let updatedPos = [...vals.get(num), {r: r, c: c}];
+                vals.set(num, updatedPos);
             }
 
             // done with column
+            let swapPos = null;
+            let valIn = null;
+            let c1 = false;
+            let c2 = false;
             for (let [key, value] of vals) {
+                let m = 0;
                 if (value.length == 0) {
                     // find a number to swap with
-                    for (let [k, v] of vals) {
-                        if (v.length > 1) {
-                            let swapPos = v.reduce((a,b) => sudoku.numConflicts(a.r, a.c) > sudoku.numConflicts(b.r, b.c) ? a : b);
-                            sudoku.set(swapPos.r, swapPos.c, key);
-                            break;
-                        }
+                    valIn = key;
+                    c1 = true;
+                }
+                else if (value.length > 1) {
+                    if ( value.length > m) {
+                        m = value.length;
+                        swapPos = value.reduce((a,b) => sudoku.numConflicts(a.r, a.c) > sudoku.numConflicts(b.r, b.c) ? a : b);
+                        c2 = true;
                     }
                 }
             }
+            if (c1 && c2) {sudoku.set(swapPos.r, swapPos.c, valIn);}
         }
-        settings.Policy = "square";
-    }
     return { gene: sudoku.board, fitness: settings.fitnessFunction(sudoku.board) };
 }
 
